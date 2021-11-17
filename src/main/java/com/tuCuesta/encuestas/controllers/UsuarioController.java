@@ -7,7 +7,7 @@ import javax.validation.Valid;
 
 import com.tuCuesta.encuestas.models.UsuarioModel;
 import com.tuCuesta.encuestas.services.UsuarioService;
-
+import com.tuCuesta.encuestas.utils.BCrypt;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +27,9 @@ public class UsuarioController {
     @PostMapping("/usuarios")
     public ResponseEntity<Map<String,String>> guardar(@Valid @RequestBody UsuarioModel usuario){
         Map<String,String> respuesta = new HashMap<>();
+
+        //Linea que hace el cifrado de la contrasena con la clase BCryp
+        usuario.setPassword(BCrypt.hashpw(usuario.getPassword(), BCrypt.gensalt()));
 
         UsuarioModel u = this.usuarioService.buscarUsername(usuario.getUsername());
 
