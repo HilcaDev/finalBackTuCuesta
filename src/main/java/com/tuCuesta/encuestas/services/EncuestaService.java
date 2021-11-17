@@ -19,7 +19,7 @@ public class EncuestaService {
 
     }
 
-    public List<EncuestaModel> obtenerEncuestas(){
+    public List<EncuestaModel> traerTodos(){
         return this.encuestaRepository.findAll();
     }
 }

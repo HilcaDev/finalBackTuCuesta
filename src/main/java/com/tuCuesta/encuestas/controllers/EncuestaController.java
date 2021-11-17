@@ -42,4 +42,10 @@ public class EncuestaController {
         return ResponseEntity.ok(respuesta); 
     }
 
+    // Permite mostrar las encuestas en el navegador
+    @GetMapping("/encuestas")
+    public List<EncuestaModel> mostrar(){
+       return service.traerTodos();
+    }
+
 }

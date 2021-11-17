@@ -13,8 +13,16 @@ public class EncuestaModel {
     private int votoscandidato2;
     private CandidatoModel candidato1;
     private CandidatoModel candidato2;
+    private UsuarioModel usuario;
 
-    
+
+    public UsuarioModel getUsuario() {
+        return usuario;
+    }
+    public void setUsuario(UsuarioModel usuario) {
+        this.usuario=usuario; 
+    }
+
     public String getId() {
         return id;
     }
