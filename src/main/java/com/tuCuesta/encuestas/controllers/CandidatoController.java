@@ -28,7 +28,7 @@ public class CandidatoController {
     public ResponseEntity<Map<String,String>> guardar(@Valid @RequestBody CandidatoModel candidato){
         this.candidatoService.guardarCandidato(candidato);
         Map<String,String> respuesta = new HashMap<>();
-        respuesta.put("mensaje", "El candidato se agrego correctamente");
+        respuesta.put("mensaje", "El candidato se agregó correctamente");
         respuesta.put("estado", "true");
         return ResponseEntity.ok(respuesta); 
     }

@@ -1,6 +1,8 @@
 package com.tuCuesta.encuestas.controllers;
 
+import java.security.Provider.Service;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
@@ -11,6 +13,7 @@ import com.tuCuesta.encuestas.utils.BCrypt;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,12 +38,17 @@ public class UsuarioController {
 
         if(u.getId()==null){
             this.usuarioService.guardarUsuario(usuario);
-            respuesta.put("mensaje", "El usuario se agrego correctamente");
+            respuesta.put("mensaje", "El usuario se agregó correctamente");
         } else{
 
             respuesta.put("mensaje", "El usuario ya esta registrado");
         }
 
         return ResponseEntity.ok(respuesta);
+    }
+
+    @GetMapping("/usuarios")
+    public List<UsuarioModel> mostrar(){
+       return usuarioService.traerTodos();
     }
 }
