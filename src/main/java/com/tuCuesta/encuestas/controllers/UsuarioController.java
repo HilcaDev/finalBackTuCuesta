@@ -56,11 +56,41 @@ public class UsuarioController {
 
     @GetMapping("/usuarios")
     public List<UsuarioModel> mostrar(){
-       return usuarioService.traerTodos();
+    return usuarioService.traerTodos();
     }
 
-      //Método para el manejo de errores
-      public void throwError(Errors error){
+    // Metodo login de usuarios
+    @PostMapping("/usuarios/login")
+    public ResponseEntity<Map<String,String>> acceder(@RequestBody UsuarioModel usuario){
+
+        // Objeto auxiliar del tipo usuarioModel
+        UsuarioModel auxiliar = this.usuarioService.buscarUsername(usuario.getUsername());
+
+        // Map para el mensaje
+        Map<String,String> respuesta = new HashMap<>();
+
+        // Condiciones de acceso
+        // Username no debe estar vacio
+        if(auxiliar.getUsername() == null){
+            respuesta.put("mensaje", "Usuario o contraseña incorrectos");
+        } else {
+            // contrasenas diferentes
+            if(!BCrypt.checkpw(usuario.getPassword(), auxiliar.getPassword())){
+                respuesta.put("mensaje", "Usuario o contraseña incorrectos");
+            
+            } else{
+                // contrasenas iguales
+                respuesta.put("mensaje", "Se accedió correctamente");
+                
+            }
+        }
+
+        return ResponseEntity.ok(respuesta);
+
+    }
+
+    //Método para el manejo de errores
+    public void throwError(Errors error){
         String mensaje="";
         int index=0;
         for(ObjectError e: error.getAllErrors()){
