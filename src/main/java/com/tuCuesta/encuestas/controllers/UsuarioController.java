@@ -7,12 +7,15 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
+import com.tuCuesta.encuestas.exceptions.CustomException;
 import com.tuCuesta.encuestas.models.UsuarioModel;
 import com.tuCuesta.encuestas.services.UsuarioService;
 import com.tuCuesta.encuestas.utils.BCrypt;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,14 +31,18 @@ public class UsuarioController {
 
     //Meetodo para agregar un usuario
     @PostMapping("/usuarios")
-    public ResponseEntity<Map<String,String>> guardar(@Valid @RequestBody UsuarioModel usuario){
-        Map<String,String> respuesta = new HashMap<>();
+    public ResponseEntity<Map<String,String>> guardar(@Valid @RequestBody UsuarioModel usuario, Errors error){
+       
+        if(error.hasErrors()){ // Hay un error, evita que se guarden datos nulos en la BD
+            throwError(error);
+        }
 
+        Map<String,String> respuesta = new HashMap<>();
+        
         //Linea que hace el cifrado de la contrasena con la clase BCryp
         usuario.setPassword(BCrypt.hashpw(usuario.getPassword(), BCrypt.gensalt()));
 
         UsuarioModel u = this.usuarioService.buscarUsername(usuario.getUsername());
-
         if(u.getId()==null){
             this.usuarioService.guardarUsuario(usuario);
             respuesta.put("mensaje", "El usuario se agregó correctamente");
@@ -50,5 +57,18 @@ public class UsuarioController {
     @GetMapping("/usuarios")
     public List<UsuarioModel> mostrar(){
        return usuarioService.traerTodos();
+    }
+
+      //Método para el manejo de errores
+      public void throwError(Errors error){
+        String mensaje="";
+        int index=0;
+        for(ObjectError e: error.getAllErrors()){
+            if(index>0){
+                mensaje +=" | ";
+            }
+            mensaje+=String.format("Parametro: %s - Mensaje: %s", e.getObjectName(),e.getDefaultMessage());
+        }
+        throw new CustomException(mensaje);
     }
 }
