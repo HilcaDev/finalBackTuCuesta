@@ -1,6 +1,7 @@
 package com.tuCuesta.encuestas.controllers;
 
 import java.security.Provider.Service;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import javax.validation.Valid;
 import com.tuCuesta.encuestas.exceptions.CustomException;
 import com.tuCuesta.encuestas.models.UsuarioModel;
 import com.tuCuesta.encuestas.services.UsuarioService;
+import com.tuCuesta.encuestas.utils.Autorizacion;
 import com.tuCuesta.encuestas.utils.BCrypt;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 @RestController
 @RequestMapping("/api")
@@ -81,7 +86,24 @@ public class UsuarioController {
             } else{
                 // contrasenas iguales
                 respuesta.put("mensaje", "Se accedió correctamente");
-                
+                String hash="";
+                Long tiempo = System.currentTimeMillis();
+    
+                // Ahora ademas del mensaje  nos debe enviar el TOKEN de autenticacion
+                if(auxiliar.getId() != ""){
+                    hash=Jwts.builder()
+                        .signWith(SignatureAlgorithm.HS256, Autorizacion.KEY)
+                        .setSubject(auxiliar.getNombre())
+                        .setIssuedAt(new Date(tiempo))
+                        .setExpiration(new Date(tiempo + 900000))    
+                        .claim("username", auxiliar.getUsername())   
+                        .claim("correo", auxiliar.getCorreo())       
+                        .compact(); 
+                }
+
+                auxiliar.setHash(hash);
+                respuesta.put("hash", hash);
+
             }
         }
 
