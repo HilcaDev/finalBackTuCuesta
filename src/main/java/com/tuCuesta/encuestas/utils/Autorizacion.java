@@ -24,32 +24,31 @@ public class Autorizacion implements Filter{
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        // TODO Auto-generated method stub
 
         HttpServletRequest req = (HttpServletRequest) request;
 
         // Trae la cadena http://localhost:8080
         String url = req.getRequestURI();
-        
-
-        // Solo estas rutas son publicas 
         if(url.contains("/api/usuarios") || url.contains("/api/usuarios/login")){
-            chain.doFilter(request, response);
-
+            chain.doFilter(request, response); // Solo estas rutas son publicas 
+        
         } else{
             String hash = req.getHeader("Authorization");
             if(hash == null || hash.trim().equals("")){
                 response.setContentType("application/json");
-
-                String body="{\"autorizacion\":\"NO ESTA AUTORIZADO PARA ACCEDER A ESTA PAGINA, DEBE HACER LOGIN PRIMERO\"}";
+                String body="{\"autorizacion\":\"Denegada. Realizar login para poder acceder a esta pagina\"}";
                 response.getWriter().write(body);
-            } else {
 
+            } try {
                 Jws<Claims> claims = Jwts.parser().setSigningKey(KEY).parseClaimsJws(hash);
                 if((url.contains("/api/encuestas") || url.contains("/api/candidatos")) && (!claims.getBody().get("username").equals(""))){
-                    chain.doFilter(request, response);
+                chain.doFilter(request, response);
                 }
 
+            } catch (MalformedJwtException e) {
+                response.setContentType("application/json");
+                String body="{\"autorizacion\":\"Token inválido\"}";
+                response.getWriter().write(body);
             }
         }
     }
