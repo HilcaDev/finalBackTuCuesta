@@ -16,7 +16,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 
-@Component
+//@Component 
 public class Autorizacion implements Filter{
     
     public static final String KEY="abcabcabc";
@@ -33,6 +33,7 @@ public class Autorizacion implements Filter{
             chain.doFilter(request, response); // Solo estas rutas son publicas 
         
         } else{
+            
             String hash = req.getHeader("Authorization");
             if(hash == null || hash.trim().equals("")){
                 response.setContentType("application/json");
