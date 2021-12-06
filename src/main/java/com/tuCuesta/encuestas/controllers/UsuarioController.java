@@ -30,7 +30,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 @RestController
-@CrossOrigin(origins = "*", methods = {RequestMethod.GET,RequestMethod.POST}) // Para que se pueda conectar con el frontend y acepte cualquier cliente
+@CrossOrigin(origins = "*") // Para que se pueda conectar con el frontend y acepte cualquier cliente
 @RequestMapping("/api")
 public class UsuarioController {
 
