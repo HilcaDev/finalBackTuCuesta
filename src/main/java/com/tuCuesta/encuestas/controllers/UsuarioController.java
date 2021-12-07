@@ -37,6 +37,16 @@ public class UsuarioController {
     @Autowired
     UsuarioService usuarioService;
 
+    //Verifica si el token esta activo
+    @GetMapping("/verificar")
+    public ResponseEntity<Map<String,Boolean>> validarToken(){
+        Map<String,Boolean> respuesta  = new HashMap<>();
+        respuesta.put("ok", true);
+        return ResponseEntity.ok(respuesta);
+    }
+ 
+
+
     //Meetodo para agregar un usuario
     @PostMapping("/usuarios")
     public ResponseEntity<Map<String,String>> guardar(@Valid @RequestBody UsuarioModel usuario, Errors error){

@@ -17,6 +17,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 
+//prueba
 @Component 
 public class Autorizacion implements Filter{
     
@@ -50,7 +51,7 @@ public class Autorizacion implements Filter{
 
             } try {
                 Jws<Claims> claims = Jwts.parser().setSigningKey(KEY).parseClaimsJws(hash);
-                if((url.contains("/api/encuestas") || url.contains("/api/candidatos")) && (!claims.getBody().get("username").equals(""))){
+                if((url.contains("/api/verificar")) || (url.contains("/api/encuestas") || url.contains("/api/candidatos")) && (!claims.getBody().get("username").equals(""))){
                 chain.doFilter(request, response);
                 }
 
