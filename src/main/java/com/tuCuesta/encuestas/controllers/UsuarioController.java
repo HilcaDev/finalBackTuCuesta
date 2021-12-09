@@ -21,6 +21,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -39,7 +40,7 @@ public class UsuarioController {
 
     //Verifica si el token esta activo
     @GetMapping("/verificar")
-    public ResponseEntity<Map<String,Boolean>> validarToken(){
+    public ResponseEntity<Map<String,Boolean>> verificarToken(){
         Map<String,Boolean> respuesta  = new HashMap<>();
         respuesta.put("ok", true);
         return ResponseEntity.ok(respuesta);
@@ -49,20 +50,16 @@ public class UsuarioController {
 
     //Meetodo para agregar un usuario
     @PostMapping("/usuarios")
-    public ResponseEntity<Map<String,String>> guardar(@Valid @RequestBody UsuarioModel usuario, Errors error){
+    public ResponseEntity<Map<String,String>> guardarUsuarios(@RequestBody UsuarioModel usuario){
        
-        if(error.hasErrors()){ // Hay un error, evita que se guarden datos nulos en la BD
-            throwError(error);
-        }
-
         Map<String,String> respuesta = new HashMap<>();
         
         //Linea que hace el cifrado de la contrasena con la clase BCryp
         usuario.setPassword(BCrypt.hashpw(usuario.getPassword(), BCrypt.gensalt()));
 
-        UsuarioModel u = this.usuarioService.buscarUsername(usuario.getUsername());
+        UsuarioModel u = this.usuarioService.buscarPorUsername(usuario.getUsername());
         if(u.getId()==null){
-            this.usuarioService.guardarUsuario(usuario);
+            this.usuarioService.guardar(usuario);
             respuesta.put("mensaje", "El usuario se agregó correctamente");
         } else{
 
@@ -72,17 +69,12 @@ public class UsuarioController {
         return ResponseEntity.ok(respuesta);
     }
 
-    @GetMapping("/usuarios")
-    public List<UsuarioModel> mostrar(){
-    return usuarioService.traerTodos();
-    }
-
     // Metodo login de usuarios
     @PostMapping("/usuarios/login")
     public ResponseEntity<Map<String,String>> acceder(@RequestBody UsuarioModel usuario){
 
         // Objeto auxiliar del tipo usuarioModel
-        UsuarioModel auxiliar = this.usuarioService.buscarUsername(usuario.getUsername());
+        UsuarioModel auxiliar = this.usuarioService.buscarPorUsername(usuario.getUsername());
 
         // Map para el mensaje
         Map<String,String> respuesta = new HashMap<>();
@@ -97,13 +89,11 @@ public class UsuarioController {
                 respuesta.put("mensaje", "Usuario o contraseña incorrectos");
             
             } else{
-                // contrasenas iguales
-                respuesta.put("mensaje", "Se accedió correctamente");
                 String hash="";
                 Long tiempo = System.currentTimeMillis();
     
                 // Ahora ademas del mensaje  nos debe enviar el TOKEN de autenticacion
-                if(auxiliar.getId() != ""){
+                if(auxiliar.getId() != null){
                     hash=Jwts.builder()
                         .signWith(SignatureAlgorithm.HS256, Autorizacion.KEY)
                         .setSubject(auxiliar.getNombre())
@@ -115,7 +105,13 @@ public class UsuarioController {
                 }
 
                 auxiliar.setHash(hash);
-                respuesta.put("hash", hash);
+                respuesta.put("mensaje","Se accedió correctamente");
+                respuesta.put("token",hash);
+                respuesta.put("id",auxiliar.getId());
+                respuesta.put("nombre",auxiliar.getNombre());
+                respuesta.put("correo",auxiliar.getCorreo());
+                respuesta.put("username",auxiliar.getUsername());
+                
 
             }
         }
@@ -124,16 +120,17 @@ public class UsuarioController {
 
     }
 
-    //Método para el manejo de errores
-    public void throwError(Errors error){
-        String mensaje="";
-        int index=0;
-        for(ObjectError e: error.getAllErrors()){
-            if(index>0){
-                mensaje +=" | ";
-            }
-            mensaje+=String.format("Parametro: %s - Mensaje: %s", e.getObjectName(),e.getDefaultMessage());
-        }
-        throw new CustomException(mensaje);
+    @PutMapping("/usuarios") //POST 
+    public ResponseEntity<Map<String, String>> actualizarUsuario(@RequestBody UsuarioModel usuario){
+        
+        //Map tener una clave valor {"mensaje": "Se agregó correctamente"}
+        Map<String, String> respuesta= new HashMap<>();
+            this.usuarioService.guardar(usuario); //Actualizo al usuario
+            respuesta.put("mensaje","Se actualizó correctamente");
+
+        return ResponseEntity.ok(respuesta);
     }
+
 }
+
+   

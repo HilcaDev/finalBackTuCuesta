@@ -16,12 +16,12 @@ public class UsuarioService {
     UsuarioRepository usuarioRepository;
 
     // Metodo para guardar usuario
-    public void guardarUsuario(UsuarioModel usuario){
+    public void guardar(UsuarioModel usuario){
         this.usuarioRepository.save(usuario);
     }
 
     // Metodo para listar todos los usuarios
-    public List<UsuarioModel> traerTodos(){
+    public List<UsuarioModel> traerUsuarios(){
         return this.usuarioRepository.findAll();
     }
 
@@ -31,7 +31,7 @@ public class UsuarioService {
     }
 
     // Metodo para buscar por username
-    public UsuarioModel buscarUsername(String username){
+    public UsuarioModel buscarPorUsername(String username){
         return this.usuarioRepository.findByUsername(username).orElse(new UsuarioModel());
     }
 }

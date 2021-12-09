@@ -17,7 +17,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 
-//prueba
+
 @Component 
 public class Autorizacion implements Filter{
     
@@ -32,13 +32,12 @@ public class Autorizacion implements Filter{
         HttpServletResponse resp = (HttpServletResponse) response;
         resp.setHeader("Access-Control-Allow-Origin","*");
         resp.setHeader("Access-Control-Allow-Headers","Authorization,Content-Type");
-        resp.setHeader("Access-Control-Allow-Methods","GET,POST");
 
 
         // Trae la cadena http://localhost:8080
         String url = req.getRequestURI();
 
-        if(url.contains("/api/usuarios") || url.contains("/api/usuarios/login")){
+        if(url.contains("/api/usuarios") || url.contains("/api/usuarios/login") || url.contains("index")){
             chain.doFilter(request, response); // Solo estas rutas son publicas 
         
         } else{
@@ -55,15 +54,14 @@ public class Autorizacion implements Filter{
                 chain.doFilter(request, response);
                 }
 
-            } catch (MalformedJwtException e) {
+            } catch (Exception e) {
                 response.setContentType("application/json");
                 String body="{\"autorizacion\":\"Token inválido\"}";
-                response.getWriter().write(body);
+                response.getWriter().write(body); }
 
-            } catch(Exception e){
-                System.out.println(e.getMessage());
-            }
         }
     }
 
 }
+
+
